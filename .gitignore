@@ -1,0 +1,8 @@
+/.hbuilderx
+/unpackage
+/.DS_Store
+/**/..DS_Store
+.idea
+node_modules/*
+node_modules
+/**/*.local.*
