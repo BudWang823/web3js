@@ -15,5 +15,8 @@
   "bugs": {
     "url": "https://github.com/BudWang823/web3js/issues"
   },
-  "homepage": "https://github.com/BudWang823/web3js#readme"
+  "homepage": "https://github.com/BudWang823/web3js#readme",
+  "dependencies": {
+    "web3": "^1.7.3"
+  }
 }

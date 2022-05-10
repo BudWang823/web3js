@@ -1,0 +1,8 @@
+const Web3 = require('web3')
+const web3 = new Web3(new Web3.providers.HttpProvider('HTTP://127.0.0.1:7545'))
+// console.log(Web3.modules)
+// console.log(Web3.version)
+// web3.eth.getNodeInfo().then(console.log)
+// web3.eth.net.isListening().then(console.log)
+web3.eth.net.getId().then(console.log)
+// console.log(web3.eth.net)
