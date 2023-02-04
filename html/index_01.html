@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>web3</title>
+  <script src="https://cdn.bootcdn.net/ajax/libs/web3/1.8.1/web3.min.js"></script>
+</head>
+<body>
+<div>
+  <input type="text" id="name">
+  <input type="text" id="age">
+  <button id="btn">上链</button>
+</div>
+<div>
+<ul id="ul"></ul>
+</div>
+</body>
+<script type="module">
+	var web3 = new Web3(Web3.givenProvider || "http://localhost:8545");
+	const account = await web3.eth.requestAccounts()
+	console.log('用户信息获取成功--',account)
+	const abi = [
+		{
+			"inputs": [
+				{
+					"internalType": "uint256",
+					"name": "",
+					"type": "uint256"
+				}
+			],
+			"name": "StudentList",
+			"outputs": [
+				{
+					"internalType": "uint256",
+					"name": "id",
+					"type": "uint256"
+				},
+				{
+					"internalType": "string",
+					"name": "name",
+					"type": "string"
+				},
+				{
+					"internalType": "uint256",
+					"name": "age",
+					"type": "uint256"
+				},
+				{
+					"internalType": "address",
+					"name": "account",
+					"type": "address"
+				}
+			],
+			"stateMutability": "view",
+			"type": "function",
+			"constant": true
+		},
+		{
+			"inputs": [
+				{
+					"internalType": "string",
+					"name": "_name",
+					"type": "string"
+				},
+				{
+					"internalType": "uint256",
+					"name": "_age",
+					"type": "uint256"
+				}
+			],
+			"name": "addList",
+			"outputs": [
+				{
+					"internalType": "uint256",
+					"name": "",
+					"type": "uint256"
+				}
+			],
+			"stateMutability": "nonpayable",
+			"type": "function"
+		},
+		{
+			"inputs": [],
+			"name": "getList",
+			"outputs": [
+				{
+					"components": [
+						{
+							"internalType": "uint256",
+							"name": "id",
+							"type": "uint256"
+						},
+						{
+							"internalType": "string",
+							"name": "name",
+							"type": "string"
+						},
+						{
+							"internalType": "uint256",
+							"name": "age",
+							"type": "uint256"
+						},
+						{
+							"internalType": "address",
+							"name": "account",
+							"type": "address"
+						}
+					],
+					"internalType": "struct StudentListStorage.Student[]",
+					"name": "",
+					"type": "tuple[]"
+				}
+			],
+			"stateMutability": "view",
+			"type": "function",
+			"constant": true
+		}
+	]
+	const address = '0xBD112D9BFF4Ad9bc50b4EdcA72059B484e8C57C4'
+	// 连接智能合约
+	const contract = await new web3.eth.Contract(abi, address)
+  console.log('合约信息获取成功', contract)
+	getList()
+	btn.onclick = async function () {
+		const nameDom =  document.getElementById('name')
+		const ageDom =  document.getElementById('age')
+    const name =nameDom.value
+    const age = ageDom.value * 1
+    try{
+			await contract.methods.addList(name,age).send({from:account[0]})
+			console.log('添加用户成功')
+			nameDom.value = ''
+			ageDom.value = ''
+    } catch (e) {
+      console.log(e)
+		}
+
+
+		getList()
+	}
+	async function getList() {
+		const list = await contract.methods.getList().call()
+    console.log(list)
+		ul.innerHTML = list.map((item, index) => {
+    	return `
+    	<li>
+    	  <span>id: ${item.id}-------</span>
+    	  <span>name: ${item.name}-------</span>
+    	  <span>age: ${item.age}-------</span>
+    	  <span>account: ${item.account}</span>
+      </li>
+    	`
+    }).join('')
+
+	}
+
+</script>
+</html>
