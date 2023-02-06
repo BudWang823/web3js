@@ -9,21 +9,23 @@ module.exports = async function (callback) {
     const wztoken = await WzTokenContract.deployed()
     const exchange = await ExchangeContract.deployed()
     const ETHER_ADDRESS = await exchange.ETHER()
+    console.log('=========================================ETH===============================================')
+
     // 存入eth
-    // await exchange.depositEther({
-    //     from: accounts[0],
-    //     value: toWei(10)
-    // })
+    await exchange.depositEther({
+        from: accounts[0],
+        value: toWei(10)
+    })
     // 查询转入的以太坊数量
-    // const res = await exchange.tokens(ETHER_ADDRESS,accounts[0])
-    // console.log(fromWei(res))
-    // console.log(fromWei(await wztoken.balanceOf(accounts[0])))
+    const res = await exchange.tokens(ETHER_ADDRESS,accounts[0])
+    console.log('交易所中ETH:', fromWei(res))
 
 
 
-
+console.log('=========================================WZT===============================================')
     // 存入WZT
     // 授权
+    console.log('wallet ETH:', fromWei(await wztoken.balanceOf(accounts[0])))
     await wztoken.approve(exchange.address,toWei(100000), {
         from: accounts[0]
     })
@@ -34,9 +36,9 @@ module.exports = async function (callback) {
         from: accounts[0]
     })
     // 查询交易所拥有wzt额度
-    console.log(`查询交易所拥有wzt额度`,fromWei(await exchange.tokens(wztoken.address, accounts[0])))
+    console.log(`交易所中WZT`,fromWei(await exchange.tokens(wztoken.address, accounts[0])))
     // 查询钱包wzt余额
-    console.log(`查询钱包wzt余额`,fromWei(await wztoken.balanceOf(accounts[0])))
+    console.log(`wallet WZT:`,fromWei(await wztoken.balanceOf(accounts[0])))
 
 
 

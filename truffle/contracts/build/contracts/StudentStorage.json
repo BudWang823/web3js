@@ -6250,12 +6250,12 @@
     "1675687031294": {
       "events": {},
       "links": {},
-      "address": "0x855b753A304CedD223C1732f2Df11cA018114c9e",
-      "transactionHash": "0x3d63965aab3996d6778e8cfe8ca130a2782414c0e9f3cc27d51db3755f62fa54"
+      "address": "0x344178520880c65FaE87c6B899112202A821314e",
+      "transactionHash": "0xeff5a3d593c1602775c7f03f2ef2964ff778946511a22cda7003e5dc98ae059b"
     }
   },
   "schemaVersion": "3.4.11",
-  "updatedAt": "2023-02-06T12:46:43.647Z",
+  "updatedAt": "2023-02-06T13:38:50.624Z",
   "networkType": "ethereum",
   "devdoc": {
     "kind": "dev",

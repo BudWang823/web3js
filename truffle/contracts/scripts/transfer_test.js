@@ -14,7 +14,7 @@ module.exports = async function (callback) {
   await token.transfer(users[1],toWei(100), { 
     from: users[0]
   })
-  console.log('--------tranfer:完成')
+  console.log('--------transfer:完成')
 
   console.log('第1个账户余额', fromWei(await token.balanceOf(users[0])))
   console.log('第2个账户余额', fromWei(await token.balanceOf(users[1])))
