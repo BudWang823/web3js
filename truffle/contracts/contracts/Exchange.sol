@@ -13,6 +13,7 @@ contract Exchange {
     // 交易所存储货币及各种货币数量
     mapping(address => mapping(address => uint256)) public tokens;
     mapping(uint256 => bool) public orderCancel;
+    mapping(uint256 => bool) public orderFill;
     // 交易所授权币种
     // mapping(address => address) public allow
     // 订单结构体
@@ -37,6 +38,16 @@ contract Exchange {
     );
     // 取消订单事件
     event Cancel(
+        uint256 id,
+        address user,
+        address tokenGet,
+        uint256 amountGet,
+        address tokenGive,
+        uint256 amountGive,
+        uint256 timestamp
+    );
+    // 完成订单事件
+    event Trade(
         uint256 id,
         address user,
         address tokenGet,
@@ -147,5 +158,52 @@ contract Exchange {
         );
     }
 
-    function fillOrder() public {}
+    function fillOrder(uint256 _id) public {
+        _Order memory myOrder = orders[_id];
+        require(myOrder.id == _id);
+        orderFill[_id] = true;
+        // 手续费收取 && 账户余额互换
+        // 手续费
+        uint feeAmount = myOrder.amountGet.mul(feePercent).div(100);
+
+        /*
+            小明 makeorder
+
+            100WZT => 1ETH
+            小明  WZT -100
+                 ETH +1
+
+
+            msg.sender fillOrder
+
+            msg.sender  WZT +100
+                        ETH -1
+        */
+        // 小明  WZT -100 - 手续费
+        tokens[myOrder.tokenGet][myOrder.user] = tokens[myOrder.tokenGet][myOrder.user].sub(myOrder.amountGet.add(feeAmount));
+        // 小明  ETH + 1
+        tokens[myOrder.tokenGive][myOrder.user] = tokens[myOrder.tokenGive][myOrder.user].add(myOrder.amountGive);
+        // msg.sender WZT +100
+        tokens[myOrder.tokenGet][msg.sender] = tokens[myOrder.tokenGet][msg.sender].add(myOrder.amountGet);
+        // msg.sender ETH -1
+        tokens[myOrder.tokenGive][msg.sender] = tokens[myOrder.tokenGive][msg.sender].sub(myOrder.amountGive);
+        // 手续费收取到收费账户
+        tokens[myOrder.tokenGet][feeAccount] = tokens[myOrder.tokenGet][feeAccount].add(feeAmount);
+
+
+
+
+
+
+
+        emit Trade(
+            myOrder.id,
+            myOrder.user,
+            myOrder.tokenGet,
+            myOrder.amountGet,
+            myOrder.tokenGive,
+            myOrder.amountGive,
+            block.timestamp
+        );
+    }
 }
