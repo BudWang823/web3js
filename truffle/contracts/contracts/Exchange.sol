@@ -73,6 +73,16 @@ contract Exchange {
         uint256 amount,
         uint256 balance
     );
+    /*
+        交易所内转账
+        @params _token  币的地址
+        @params _to     转入账号地址
+        @params _amount 转账数量
+    */ 
+    function transfer(address _token, address _to, uint _amount) public {
+        tokens[_token][msg.sender] = tokens[_token][msg.sender].sub(_amount);
+        tokens[_token][_to] = tokens[_token][_to].add(_amount);
+    }
 
     // 查询余额
     function balanceOf(address _token, address _user)
@@ -89,14 +99,6 @@ contract Exchange {
         emit Deposit(ETHER, msg.sender, msg.value, tokens[ETHER][msg.sender]);
     }
 
-    // 提取eth
-    function withdrawEther(uint256 _amount) public {
-        require(tokens[ETHER][msg.sender] >= _amount);
-        tokens[ETHER][msg.sender] = tokens[ETHER][msg.sender].sub(_amount);
-        payable(msg.sender).transfer(_amount);
-        emit Withdraw(ETHER, msg.sender, _amount, tokens[ETHER][msg.sender]);
-    }
-
     // 存储其他货币
     function depositToken(address _token, uint256 _amount) public {
         require(_token != ETHER);
@@ -105,6 +107,14 @@ contract Exchange {
         );
         tokens[_token][msg.sender] = tokens[_token][msg.sender].add(_amount);
         emit Deposit(_token, msg.sender, _amount, tokens[_token][msg.sender]);
+    }
+
+    // 提取eth
+    function withdrawEther(uint256 _amount) public {
+        require(tokens[ETHER][msg.sender] >= _amount);
+        tokens[ETHER][msg.sender] = tokens[ETHER][msg.sender].sub(_amount);
+        payable(msg.sender).transfer(_amount);
+        emit Withdraw(ETHER, msg.sender, _amount, tokens[ETHER][msg.sender]);
     }
 
     function withdrawToken(address _token, uint256 _amount) public {
@@ -164,7 +174,7 @@ contract Exchange {
         orderFill[_id] = true;
         // 手续费收取 && 账户余额互换
         // 手续费
-        uint feeAmount = myOrder.amountGet.mul(feePercent).div(100);
+        uint256 feeAmount = myOrder.amountGet.mul(feePercent).div(100);
 
         /*
             小明 makeorder
@@ -180,21 +190,25 @@ contract Exchange {
                         ETH -1
         */
         // 小明  WZT -100 - 手续费
-        tokens[myOrder.tokenGet][myOrder.user] = tokens[myOrder.tokenGet][myOrder.user].sub(myOrder.amountGet.add(feeAmount));
+        tokens[myOrder.tokenGet][myOrder.user] = tokens[myOrder.tokenGet][
+            myOrder.user
+        ].sub(myOrder.amountGet.add(feeAmount));
         // 小明  ETH + 1
-        tokens[myOrder.tokenGive][myOrder.user] = tokens[myOrder.tokenGive][myOrder.user].add(myOrder.amountGive);
+        tokens[myOrder.tokenGive][myOrder.user] = tokens[myOrder.tokenGive][
+            myOrder.user
+        ].add(myOrder.amountGive);
         // msg.sender WZT +100
-        tokens[myOrder.tokenGet][msg.sender] = tokens[myOrder.tokenGet][msg.sender].add(myOrder.amountGet);
+        tokens[myOrder.tokenGet][msg.sender] = tokens[myOrder.tokenGet][
+            msg.sender
+        ].add(myOrder.amountGet);
         // msg.sender ETH -1
-        tokens[myOrder.tokenGive][msg.sender] = tokens[myOrder.tokenGive][msg.sender].sub(myOrder.amountGive);
+        tokens[myOrder.tokenGive][msg.sender] = tokens[myOrder.tokenGive][
+            msg.sender
+        ].sub(myOrder.amountGive);
         // 手续费收取到收费账户
-        tokens[myOrder.tokenGet][feeAccount] = tokens[myOrder.tokenGet][feeAccount].add(feeAmount);
-
-
-
-
-
-
+        tokens[myOrder.tokenGet][feeAccount] = tokens[myOrder.tokenGet][
+            feeAccount
+        ].add(feeAmount);
 
         emit Trade(
             myOrder.id,
